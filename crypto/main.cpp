@@ -12,6 +12,13 @@ int main() {
     cout << "Введите ключ: ";
     getline(cin, key);
     
+    // Принудительная проверка
+    while (key.empty()) {
+        cout << "Ошибка: ключ не может быть пустым!\n";
+        cout << "Введите ключ: ";
+        getline(cin, key);
+    }
+
     int ch;
     do {
         clearScreen();
@@ -21,16 +28,16 @@ int main() {
         }
         menu();
         cin >> ch;
+        cout << endl;
         cin.ignore();
         
         switch (ch) {
             case 1: selectCipher(mgr); break;
-            case 2: encryptText(mgr, key); break;
-            case 3: decryptText(mgr, key); break;
-            case 4: encryptFile(mgr, key); break;
-            case 5: decryptFile(mgr, key); break;
-            case 6: listCiphers(mgr); break;
-            case 7: viewEncryptedFile(); break;
+            case 2: testCipher(mgr, key); break;
+            case 3: encryptFile(mgr, key); break;
+            case 4: decryptFile(mgr, key); break;
+            case 5: listCiphers(mgr); break;
+            case 6: viewEncryptedFile(); break;
             case 0: cout << "До свидания\n"; break;
             default: cout << "Неверный выбор\n"; waitForEnter();
         }
