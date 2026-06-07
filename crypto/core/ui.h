@@ -2,20 +2,21 @@
 #define UI_H
 
 #include "mgr.h"
-
-using namespace std;
+#include "errors.h"
+#include "auth.h"
 
 void clearScreen();
-void printHex(const string& s);
+void printHex(const std::string& s);
 void menu();
 void waitForEnter();
 void selectCipher(Mgr& mgr);
-void encryptText(Mgr& mgr, const string& key);
-void decryptText(Mgr& mgr, const string& key);
 void testCipher(Mgr& mgr, const std::string& key);
-void encryptFile(Mgr& mgr, const string& key);
-void decryptFile(Mgr& mgr, const string& key);
+void encryptFile(Mgr& mgr, const std::string& key);
+void decryptFile(Mgr& mgr, const std::string& key);
 void listCiphers(Mgr& mgr);
 void viewEncryptedFile();
+
+
+bool runAuth(Auth& auth);
 
 #endif
