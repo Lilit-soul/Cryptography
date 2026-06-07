@@ -1,9 +1,13 @@
 #include "ui.h"
+#include "auth.h"
+#include <errors.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <unistd.h>
 #include <vector>
+#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
@@ -19,27 +23,71 @@ void printHex(const string& s) {
 }
 
 void menu() {
-    cout << "\n=== Программа шифрования ===\n";
-    cout << "1. Выбрать шифр\n";
-    cout << "2. Зашифровать текст\n";
-    cout << "3. Расшифровать текст\n";
-    cout << "4. Зашифровать файл\n";
-    cout << "5. Расшифровать файл\n";
-    cout << "6. Список шифров\n";
-    cout << "7. Просмотреть зашифрованный файл \n";
-    cout << "0. Выход\n";
+    cout << "\n\033[1;35m               FlexCipher     \033[0m\n";
+    cout << "┌─────────────────────────────────────┐\n";
+    cout << "│ 1. Выбрать шифр                     │\n";
+    cout << "│ 2. Шифрование + расшифровка текста  │\n";
+    cout << "│ 3. Зашифровать файл                 │\n";
+    cout << "│ 4. Расшифровать файл                │\n";
+    cout << "│ 5. Список шифров                    │\n";
+    cout << "│ 6. Просмотреть зашифрованный файл   │\n";
+    cout << "│ 7. Сменить мастер-пароль            │\n";
+    cout << "│ 0. Выход                            │\n";
+    cout << "└─────────────────────────────────────┘\n";
     cout << "Выбор: ";
 }
+
 
 void waitForEnter() {
     cout << "\nНажмите Enter для продолжения...";
     cin.get();
 }
 
+bool runAuth(Auth& auth) {
+    clearScreen();
+    
+    // Первый запуск или вход
+    if (auth.isFirstRun()) {
+        if (!auth.setupMasterPassword()) {
+            cout << "Ошибка создания пароля. Программа завершена.\n";
+            return false;
+        }
+        cout << "\nМастер-пароль создан!\n";
+        waitForEnter();
+        clearScreen();
+    }
+    
+    // Вход в программу
+    int attempts = 0;
+    while (!auth.login()) {
+        attempts++;
+        if (attempts >= 3) {
+            cout << "Превышено количество попыток. Программа завершена.\n";
+            return false;
+        }
+        cout << "\033[31mНеверный пароль.\033[0m Осталось попыток: " << 3 - attempts << "\n";
+    }
+    
+    return true;
+}
+
+string getEncryptionKey() {
+    string key;
+    cout << "Введите ключ шифрования: ";
+    getline(cin, key);
+    
+    if (key.empty()) {
+        cout << "Предупреждение: ключ пуст. Шифрование будет небезопасным!\n";
+        waitForEnter();
+    }
+    
+    return key;
+}
+
 void selectCipher(Mgr& mgr) {
     auto list = mgr.list();
     if (list.empty()) {
-        cout << "Нет доступных шифров\n";
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "нет доступных шифров");
         waitForEnter();
         return;
     }
@@ -53,78 +101,153 @@ void selectCipher(Mgr& mgr) {
     string inp;
     getline(cin, inp);
     
+    if (inp.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "название не введено");
+        waitForEnter();
+        return;
+    }
+    
     if (mgr.select(inp))
         cout << "Шифр выбран\n";
     else
-        cout << "Шифр не найден\n";
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "шифр не найден");
     
     waitForEnter();
 }
 
-void encryptText(Mgr& mgr, const string& key) {
-    cout << "Текст: ";
-    string txt;
-    getline(cin, txt);
-    string enc = mgr.encText(txt, key);
-    cout << "Зашифровано (hex): ";
-    printHex(enc);
-    cout << "\n";
-    waitForEnter();
-}
-
-void decryptText(Mgr& mgr, const string& key) {
-    cout << "Зашифрованный текст (hex): ";
-    string hex;
-    getline(cin, hex);
-    
-    string enc;
-    for (size_t i = 0; i < hex.length(); i += 2) {
-        if (i+1 < hex.length()) {
-            string byte = hex.substr(i, 2);
-            enc += (char)strtol(byte.c_str(), nullptr, 16);
-        }
+void testCipher(Mgr& mgr, const string& key) {
+    if (mgr.list().empty()) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "нет доступных шифров");
+        waitForEnter();
+        return;
     }
     
-    string dec = mgr.decText(enc, key);
-    cout << "Расшифровано: " << dec << "\n";
+    if (mgr.info() == "Шифр не выбран") {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "шифр не выбран");
+        waitForEnter();
+        return;
+    }
+    
+    cout << "Введите текст: ";
+    string txt;
+    getline(cin, txt);
+    
+    if (txt.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "текст не введён");
+        waitForEnter();
+        return;
+    }
+    
+    string encrypted;
+    if (!mgr.encTextSafe(txt, key, encrypted)) {
+        waitForEnter();
+        return;
+    }
+    
+    cout << "\nЗашифровано (hex): ";
+    printHex(encrypted);
+    
+    string decrypted;
+    if (!mgr.decTextSafe(encrypted, key, decrypted)) {
+        waitForEnter();
+        return;
+    }
+    
+    cout << "\nРасшифровано: " << decrypted;
+    
+    if (txt == decrypted) {
+        cout << "\n✓ Отлично, всё совпало!\n";
+    } else {
+        safeShowError(ErrorCode::ERR_DECRYPT_FAIL, "тексты не совпадают");
+    }
+    
     waitForEnter();
 }
 
 void encryptFile(Mgr& mgr, const string& key) {
+    if (mgr.list().empty()) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "нет доступных шифров");
+        waitForEnter();
+        return;
+    }
+    
+    if (mgr.info() == "Шифр не выбран") {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "шифр не выбран");
+        waitForEnter();
+        return;
+    }
+    
     string in, out;
     cout << "Входной файл: ";
     getline(cin, in);
+    
+    if (in.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "имя файла не введено");
+        waitForEnter();
+        return;
+    }
+    
     cout << "Выходной файл (рекомендуется .enc): ";
     getline(cin, out);
     
-    if (mgr.encFile(in, out, key))
-        cout << "Файл зашифрован\n";
-    else
-        cout << "Ошибка\n";
+    if (out.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "имя выходного файла не введено");
+        waitForEnter();
+        return;
+    }
     
+    mgr.encFileSafe(in, out, key);
     waitForEnter();
 }
 
 void decryptFile(Mgr& mgr, const string& key) {
+    if (mgr.list().empty()) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "нет доступных шифров");
+        waitForEnter();
+        return;
+    }
+    
+    if (mgr.info() == "Шифр не выбран") {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "шифр не выбран");
+        waitForEnter();
+        return;
+    }
+    
     string in, out;
     cout << "Входной файл: ";
     getline(cin, in);
+    
+    if (in.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "имя файла не введено");
+        waitForEnter();
+        return;
+    }
+    
     cout << "Выходной файл: ";
     getline(cin, out);
     
-    if (mgr.decFile(in, out, key))
-        cout << "Файл расшифрован\n";
-    else
-        cout << "Ошибка\n";
+    if (out.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "имя выходного файла не введено");
+        waitForEnter();
+        return;
+    }
     
+    mgr.decFileSafe(in, out, key);
     waitForEnter();
 }
 
 void listCiphers(Mgr& mgr) {
     auto list = mgr.list();
-    cout << "\nШифры (" << list.size() << "):\n";
-    for (const auto& c : list)
-        cout << "  - " << c << "\n";
+    
+    if (list.empty()) {
+        cout << "\nНет доступных шифров\n";
+        cout << "Проверьте, что файлы шифров (.cpp) есть в папке ciphers/\n";
+    } else {
+        cout << "\nДоступные шифры (" << list.size() << "):\n";
+        for (const auto& c : list)
+            cout << "  - " << c << "\n";
+    }
+    
     waitForEnter();
 }
 
@@ -133,19 +256,35 @@ void viewEncryptedFile() {
     cout << "Введите имя зашифрованного файла: ";
     getline(cin, filename);
     
-    ifstream file(filename, ios::binary);
-    if (!file) {
-        cout << "Ошибка: файл не найден\n";
+    if (filename.empty()) {
+        safeShowError(ErrorCode::ERR_INVALID_FORMAT, "имя файла не введено");
         waitForEnter();
         return;
     }
     
+    ifstream file(filename, ios::binary);
+    if (!file) {
+        safeShowError(ErrorCode::ERR_FILE_NOT_FOUND, filename);
+        waitForEnter();
+        return;
+    }
+    
+    // Проверка на пустой файл
+    file.seekg(0, ios::end);
+    if (file.tellg() == 0) {
+        safeShowError(ErrorCode::ERR_FILE_EMPTY, filename);
+        file.close();
+        waitForEnter();
+        return;
+    }
+    file.seekg(0, ios::beg);
+    
     size_t msize;
     file.read(reinterpret_cast<char*>(&msize), sizeof(msize));
     
-    if (!file || msize > 1024) {
+    if (!file || msize > 1024 || msize == 0) {
         cout << "Это не зашифрованный файл программы\n";
-        cout << "Просмотр невозможен\n";
+        cout << "Файл не содержит корректных метаданных\n";
         file.close();
         waitForEnter();
         return;
@@ -155,7 +294,7 @@ void viewEncryptedFile() {
     file.read(&meta[0], msize);
     
     if (!file) {
-        cout << "Файл поврежден\n";
+        safeShowError(ErrorCode::ERR_FILE_CORRUPTED, "не удалось прочитать метаданные");
         file.close();
         waitForEnter();
         return;
@@ -170,16 +309,20 @@ void viewEncryptedFile() {
     size_t bytesRead = file.gcount();
     data.resize(bytesRead);
     
-    for (size_t i = 0; i < data.size(); i++) {
-        cout << hex << setw(2) << setfill('0') << (int)data[i];
-        if ((i + 1) % 16 == 0)
-            cout << "\n";
-        else if ((i + 1) % 8 == 0)
-            cout << "  ";
-        else
-            cout << " ";
+    if (data.empty()) {
+        cout << "(нет данных)\n";
+    } else {
+        for (size_t i = 0; i < data.size(); i++) {
+            cout << hex << setw(2) << setfill('0') << (int)data[i];
+            if ((i + 1) % 16 == 0)
+                cout << "\n";
+            else if ((i + 1) % 8 == 0)
+                cout << "  ";
+            else
+                cout << " ";
+        }
+        cout << dec << "\n";
     }
-    cout << dec << "\n";
     
     file.seekg(0, ios::end);
     long long fileSize = static_cast<long long>(file.tellg());

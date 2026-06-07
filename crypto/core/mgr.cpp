@@ -1,132 +1,298 @@
 #include "mgr.h"
 #include "../include/loader.h"
+#include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
+#include <cerrno>
 
-// Функция для приведения строки к нижнему регистру
-std::string toLower(const std::string& s) {
-    std::string result = s;
+using namespace std;
+
+string toLower(const string& s) {
+    string result = s;
     for (char& c : result) {
-        c = std::tolower(c);
+        c = tolower(c);
     }
     return result;
 }
 
-// Функция для нормализации имени шифра (игнорируем регистр и пробелы)
-std::string normalizeName(const std::string& name) {
-    std::string result;
+string normalizeName(const string& name) {
+    string result;
     for (char c : name) {
-        if (!std::isspace(c)) {
-            result += std::tolower(c);
+        if (!isspace(c)) {
+            result += tolower(c);
         }
     }
     return result;
 }
 
-bool Mgr::select(const std::string& name) {
-    auto list = Loader::instance().list();
-    std::string normalizedInput = normalizeName(name);
-    
-    // Ищем шифр без учета регистра
-    for (const auto& cipherName : list) {
-        if (normalizeName(cipherName) == normalizedInput) {
-            auto c = Loader::instance().create(cipherName);
-            if (c) {
-                cur = std::move(c);
-                return true;
+bool Mgr::select(const string& name) {
+    try {
+        auto list = Loader::instance().list();
+        string normalizedInput = normalizeName(name);
+        
+        for (const auto& cipherName : list) {
+            if (normalizeName(cipherName) == normalizedInput) {
+                auto c = Loader::instance().create(cipherName);
+                if (c) {
+                    cur = move(c);
+                    return true;
+                }
             }
         }
+    } catch (const exception& e) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, e.what());
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "неизвестная ошибка");
     }
-    
     return false;
 }
 
-std::vector<std::string> Mgr::list() const {
-    return Loader::instance().list();
+vector<string> Mgr::list() const {
+    try {
+        return Loader::instance().list();
+    } catch (...) {
+        return vector<string>();
+    }
 }
 
-std::string Mgr::info() const {
+string Mgr::info() const {
     if (!cur) return "Шифр не выбран";
-    return cur->name() + " | ключ: " + std::to_string(cur->keySize()) + " байт | nonce: " + std::to_string(cur->nonceSize()) + " байт";
+    return cur->name() + " | ключ: " + to_string(cur->keySize()) + " байт | nonce: " + to_string(cur->nonceSize()) + " байт";
 }
 
-std::string Mgr::encText(const std::string& text, const std::string& key) {
-    if (!cur) return "";
-    std::vector<uint8_t> in(text.begin(), text.end());
-    auto enc = cur->encrypt(in, key);
-    return std::string(enc.data.begin(), enc.data.end());
+ErrorCode Mgr::encText(const string& text, const string& key, string& output) {
+    if (!cur) return ErrorCode::ERR_NO_CIPHER;
+    
+    if (text.empty()) return ErrorCode::ERR_INVALID_FORMAT;
+    
+    try {
+        vector<uint8_t> in(text.begin(), text.end());
+        auto enc = cur->encrypt(in, key);
+        
+        string result;
+        uint32_t ivSize = enc.meta.size();
+        result.append(reinterpret_cast<const char*>(&ivSize), sizeof(ivSize));
+        result.append(enc.meta);
+        result.append(enc.data.begin(), enc.data.end());
+        
+        output = result;
+        return ErrorCode::SUCCESS;
+        
+    } catch (const bad_alloc& e) {
+        return ErrorCode::ERR_NO_MEMORY;
+    } catch (const exception& e) {
+        return ErrorCode::ERR_INVALID_KEY;
+    } catch (...) {
+        return ErrorCode::ERR_INVALID_KEY;
+    }
 }
 
-std::string Mgr::decText(const std::string& data, const std::string& key) {
-    if (!cur) return "";
-    EncData enc;
-    enc.data = std::vector<uint8_t>(data.begin(), data.end());
-    auto dec = cur->decrypt(enc, key);
-    return std::string(dec.begin(), dec.end());
+ErrorCode Mgr::decText(const string& data, const string& key, string& output) {
+    if (!cur) return ErrorCode::ERR_NO_CIPHER;
+    
+    if (data.size() < sizeof(uint32_t)) return ErrorCode::ERR_INVALID_FORMAT;
+    
+    try {
+        uint32_t ivSize;
+        memcpy(&ivSize, data.data(), sizeof(ivSize));
+        
+        if (ivSize > 1024 || ivSize == 0) return ErrorCode::ERR_INVALID_FORMAT;
+        
+        if (data.size() < sizeof(ivSize) + ivSize) return ErrorCode::ERR_INVALID_FORMAT;
+        
+        string meta = data.substr(sizeof(ivSize), ivSize);
+        vector<uint8_t> encData(data.begin() + sizeof(ivSize) + ivSize, data.end());
+        
+        EncData enc;
+        enc.data = encData;
+        enc.meta = meta;
+        
+        auto dec = cur->decrypt(enc, key);
+        output = string(dec.begin(), dec.end());
+        return ErrorCode::SUCCESS;
+        
+    } catch (const bad_alloc& e) {
+        return ErrorCode::ERR_NO_MEMORY;
+    } catch (const exception& e) {
+        return ErrorCode::ERR_DECRYPT_FAIL;
+    } catch (...) {
+        return ErrorCode::ERR_DECRYPT_FAIL;
+    }
 }
 
-std::vector<uint8_t> Mgr::encData(const std::vector<uint8_t>& data, const std::string& key) {
-    if (!cur) return {};
-    return cur->encrypt(data, key).data;
+// Безопасные обёртки (не выбрасывают исключения наружу)
+bool Mgr::encTextSafe(const string& text, const string& key, string& output) {
+    try {
+        ErrorCode code = encText(text, key, output);
+        if (code != ErrorCode::SUCCESS) {
+            safeShowError(code);
+            return false;
+        }
+        return true;
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_INVALID_KEY);
+        return false;
+    }
 }
 
-std::vector<uint8_t> Mgr::decData(const std::vector<uint8_t>& data, const std::string& key) {
-    if (!cur) return {};
-    EncData enc;
-    enc.data = data;
-    return cur->decrypt(enc, key);
+bool Mgr::decTextSafe(const string& data, const string& key, string& output) {
+    try {
+        ErrorCode code = decText(data, key, output);
+        if (code != ErrorCode::SUCCESS) {
+            safeShowError(code);
+            return false;
+        }
+        return true;
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_DECRYPT_FAIL);
+        return false;
+    }
 }
 
-bool Mgr::encFile(const std::string& in, const std::string& out, const std::string& key) {
-    if (!cur) return false;
+ErrorCode Mgr::encFile(const string& in, const string& out, const string& key) {
+    if (!cur) return ErrorCode::ERR_NO_CIPHER;
     
-    std::ifstream f_in(in, std::ios::binary);
-    if (!f_in) return false;
-    
-    std::vector<uint8_t> data((std::istreambuf_iterator<char>(f_in)), std::istreambuf_iterator<char>());
-    f_in.close();
-    
-    auto enc = cur->encrypt(data, key);
-    
-    std::ofstream f_out(out, std::ios::binary);
-    if (!f_out) return false;
-    
-    size_t msize = enc.meta.size();
-    f_out.write(reinterpret_cast<const char*>(&msize), sizeof(msize));
-    f_out.write(enc.meta.c_str(), msize);
-    f_out.write(reinterpret_cast<const char*>(enc.data.data()), enc.data.size());
-    
-    f_out.close();
-    return true;
+    try {
+        ifstream f_in(in, ios::binary);
+        if (!f_in) {
+            return ErrorCode::ERR_FILE_NOT_FOUND;
+        }
+        
+        // Проверка на пустой файл
+        f_in.seekg(0, ios::end);
+        if (f_in.tellg() == 0) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_EMPTY;
+        }
+        f_in.seekg(0, ios::beg);
+        
+        vector<uint8_t> data((istreambuf_iterator<char>(f_in)), istreambuf_iterator<char>());
+        f_in.close();
+        
+        auto enc = cur->encrypt(data, key);
+        
+        ofstream f_out(out, ios::binary);
+        if (!f_out) {
+            return ErrorCode::ERR_CANNOT_CREATE;
+        }
+        
+        size_t msize = enc.meta.size();
+        f_out.write(reinterpret_cast<const char*>(&msize), sizeof(msize));
+        f_out.write(enc.meta.c_str(), msize);
+        f_out.write(reinterpret_cast<const char*>(enc.data.data()), enc.data.size());
+        
+        f_out.close();
+        return ErrorCode::SUCCESS;
+        
+    } catch (const bad_alloc& e) {
+        return ErrorCode::ERR_NO_MEMORY;
+    } catch (const exception& e) {
+        return ErrorCode::ERR_INVALID_KEY;
+    } catch (...) {
+        return ErrorCode::ERR_INVALID_KEY;
+    }
 }
 
-bool Mgr::decFile(const std::string& in, const std::string& out, const std::string& key) {
-    if (!cur) return false;
+ErrorCode Mgr::decFile(const string& in, const string& out, const string& key) {
+    if (!cur) return ErrorCode::ERR_NO_CIPHER;
     
-    std::ifstream f_in(in, std::ios::binary);
-    if (!f_in) return false;
-    
-    size_t msize;
-    f_in.read(reinterpret_cast<char*>(&msize), sizeof(msize));
-    
-    std::string meta(msize, '\0');
-    f_in.read(&meta[0], msize);
-    
-    std::vector<uint8_t> data((std::istreambuf_iterator<char>(f_in)), std::istreambuf_iterator<char>());
-    f_in.close();
-    
-    EncData enc;
-    enc.data = data;
-    enc.meta = meta;
-    
-    auto dec = cur->decrypt(enc, key);
-    
-    std::ofstream f_out(out, std::ios::binary);
-    if (!f_out) return false;
-    
-    f_out.write(reinterpret_cast<const char*>(dec.data()), dec.size());
-    f_out.close();
-    
-    return true;
+    try {
+        ifstream f_in(in, ios::binary);
+        if (!f_in) {
+            return ErrorCode::ERR_FILE_NOT_FOUND;
+        }
+        
+        f_in.seekg(0, ios::end);
+        streamoff fileSize = f_in.tellg();
+        f_in.seekg(0, ios::beg);
+        
+        if (fileSize == 0) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_EMPTY;
+        }
+        
+        if (fileSize < (streamoff)sizeof(size_t)) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_CORRUPTED;
+        }
+        
+        size_t msize;
+        f_in.read(reinterpret_cast<char*>(&msize), sizeof(msize));
+        
+        if (msize > 1024 || msize == 0) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_CORRUPTED;
+        }
+        
+        if (fileSize < (streamoff)(sizeof(msize) + msize)) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_CORRUPTED;
+        }
+        
+        string meta(msize, '\0');
+        f_in.read(&meta[0], msize);
+        
+        if (!f_in) {
+            f_in.close();
+            return ErrorCode::ERR_FILE_CORRUPTED;
+        }
+        
+        vector<uint8_t> data((istreambuf_iterator<char>(f_in)), istreambuf_iterator<char>());
+        f_in.close();
+        
+        EncData enc;
+        enc.data = data;
+        enc.meta = meta;
+        
+        auto dec = cur->decrypt(enc, key);
+        
+        ofstream f_out(out, ios::binary);
+        if (!f_out) {
+            return ErrorCode::ERR_CANNOT_CREATE;
+        }
+        
+        f_out.write(reinterpret_cast<const char*>(dec.data()), dec.size());
+        f_out.close();
+        
+        return ErrorCode::SUCCESS;
+        
+    } catch (const bad_alloc& e) {
+        return ErrorCode::ERR_NO_MEMORY;
+    } catch (const exception& e) {
+        return ErrorCode::ERR_DECRYPT_FAIL;
+    } catch (...) {
+        return ErrorCode::ERR_DECRYPT_FAIL;
+    }
+}
+
+bool Mgr::encFileSafe(const string& in, const string& out, const string& key) {
+    try {
+        ErrorCode code = encFile(in, out, key);
+        if (code != ErrorCode::SUCCESS) {
+            safeShowError(code, in);
+            return false;
+        }
+        cout << "Файл успешно зашифрован\n";
+        return true;
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_INVALID_KEY);
+        return false;
+    }
+}
+
+bool Mgr::decFileSafe(const string& in, const string& out, const string& key) {
+    try {
+        ErrorCode code = decFile(in, out, key);
+        if (code != ErrorCode::SUCCESS) {
+            safeShowError(code, in);
+            return false;
+        }
+        cout << "Файл успешно расшифрован\n";
+        return true;
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_DECRYPT_FAIL);
+        return false;
+    }
 }
