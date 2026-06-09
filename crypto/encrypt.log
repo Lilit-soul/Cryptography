@@ -1,0 +1,216 @@
+Mon Jun  8 22:37:45 2026
+ - Cipher selected: chacha20
+Mon Jun  8 22:38:30 2026
+ - File encrypted: mem.jpeg -> memes.enc
+Mon Jun  8 22:42:04 2026
+ - Error 1: Шифр не выбран - 
+Mon Jun  8 22:44:40 2026
+ - Cipher selected: rabbit
+Mon Jun  8 23:03:24 2026
+ - Error 1: Шифр не выбран - 
+Mon Jun  8 23:03:43 2026
+ - Error 1: Шифр не выбран - 
+Mon Jun  8 23:04:55 2026
+ - Cipher selected: chacha20
+Mon Jun  8 23:12:47 2026
+ - Cipher selected: chacha20
+Mon Jun  8 23:13:07 2026
+ - Test cipher: SUCCESS
+Mon Jun  8 23:15:18 2026
+ - Cipher selected: rabbit
+Mon Jun  8 23:15:24 2026
+ - Test cipher: SUCCESS
+Mon Jun  8 23:15:31 2026
+ - Error 1: Шифр не выбран - 
+Mon Jun  8 23:29:08 2026
+ - Error 1: Шифр не выбран - 
+Mon Jun  8 23:29:19 2026
+ - Cipher selected: rabbit
+Mon Jun  8 23:30:01 2026
+ - Cipher selected: rabbit
+Mon Jun  8 23:30:13 2026
+ - Test cipher: SUCCESS
+Mon Jun  8 23:30:29 2026
+ - Test cipher: SUCCESS
+Mon Jun  8 23:31:04 2026
+ - Error 14: Неверный выбор в меню - 
+Mon Jun  8 23:40:25 2026
+ - Error 10: Неверный формат данных - Введите число от 0 до 7
+Mon Jun  8 23:49:27 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Mon Jun  8 23:50:01 2026
+ - Cipher selected: chacha20
+Mon Jun  8 23:50:06 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Mon Jun  8 23:50:16 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Tue Jun  9 09:39:22 2026
+ - Cipher selected: chacha20
+Tue Jun  9 09:45:40 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Tue Jun  9 09:49:30 2026
+ - Cipher selected: chacha20
+Tue Jun  9 09:50:24 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Tue Jun  9 09:50:34 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Tue Jun  9 09:50:39 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 09:50:47 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 09:51:10 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 09:51:36 2026
+ - Error 2: Файл не найден - user.txt
+Tue Jun  9 09:51:36 2026
+ - Error 7: Неверный ключ - 
+Tue Jun  9 09:58:05 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 09:59:52 2026
+ - File encrypted: input.txt -> input.enc
+Tue Jun  9 10:07:12 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 10:12:09 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 10:12:27 2026
+ - Error 2: Файл не найден - 
+Tue Jun  9 10:12:48 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 10:18:47 2026
+ - File decrypted: decr.bin -> decrt.txt
+Tue Jun  9 11:17:55 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 11:18:06 2026
+ - Cipher selected: chacha20
+Tue Jun  9 11:19:11 2026
+ - File decrypted: input.enc -> input
+Tue Jun  9 11:19:54 2026
+ - File decrypted: memes.enc -> memes
+Tue Jun  9 11:48:45 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 11:48:51 2026
+ - Cipher selected: chacha20
+Tue Jun  9 11:51:08 2026
+ - File decrypted: memes.enc -> memes.bin
+Tue Jun  9 11:52:59 2026
+ - File encrypted: mem.jpeg -> mem.jpeg.enc
+Tue Jun  9 11:53:31 2026
+ - File decrypted: mem.jpeg.enc -> mem.jpeg.bin
+Tue Jun  9 12:06:02 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 12:06:12 2026
+ - Cipher selected: rabbit
+Tue Jun  9 12:07:56 2026
+ - File processed: input.txt -> input.txt.enc (verified)
+Tue Jun  9 12:09:06 2026
+ - File processed: mem.jpeg -> mem.jpeg.enc (verified)
+Tue Jun  9 12:10:21 2026
+ - File processed: input -> input.enc (verified)
+Tue Jun  9 12:18:29 2026
+ - File processed: mem.jpeg -> mem.jpeg.enc (verified)
+Tue Jun  9 12:22:58 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 12:23:03 2026
+ - Cipher selected: rabbit
+Tue Jun  9 12:23:18 2026
+ - File processed: mem.jpeg -> mem.jpeg.enc (verified)
+Tue Jun  9 12:33:20 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 12:33:27 2026
+ - Cipher selected: rabbit
+Tue Jun  9 12:33:48 2026
+ - File processed: mem.jpeg -> mem.enc (verified)
+Tue Jun  9 12:35:50 2026
+ - File processed: mem.jpeg -> mem.enc (verified)
+Tue Jun  9 12:42:59 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 12:43:07 2026
+ - Error 2: Файл не найден - 
+Tue Jun  9 12:43:45 2026
+ - File processed: encrypt_fw -> encrypt_fw.enc (verified)
+Tue Jun  9 12:46:13 2026
+ - File processed: input.txt -> input.enc (verified)
+Tue Jun  9 12:48:01 2026
+ - Cipher selected: rabbit
+Tue Jun  9 12:48:25 2026
+ - File processed: mem.jpeg -> mem.enc (verified)
+Tue Jun  9 13:57:18 2026
+ - Encryption key changed
+Tue Jun  9 13:57:31 2026
+ - Cipher selected: chacha20
+Tue Jun  9 13:57:36 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 13:57:55 2026
+ - Error 2: Файл не найден - 
+Tue Jun  9 13:58:35 2026
+ - Encryption key changed
+Tue Jun  9 13:59:56 2026
+ - Encryption key changed
+Tue Jun  9 14:05:18 2026
+ - Encryption key changed
+Tue Jun  9 14:05:31 2026
+ - Encryption key changed
+Tue Jun  9 14:08:07 2026
+ - Encryption key changed
+Tue Jun  9 14:56:13 2026
+ - Cipher selected: chacha20
+Tue Jun  9 14:56:20 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 16:00:20 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 16:00:29 2026
+ - Cipher selected: rabbit
+Tue Jun  9 16:00:38 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 16:32:38 2026
+ - Cipher selected: rabbit
+Tue Jun  9 16:32:49 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 16:33:33 2026
+ - File processed: main.o -> main.enc (verified)
+Tue Jun  9 16:36:08 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 16:36:42 2026
+ - Error 2: Файл не найден - 
+Tue Jun  9 16:36:53 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 16:38:07 2026
+ - Encryption key changed
+Tue Jun  9 17:23:36 2026
+ - Cipher selected: rabbit
+Tue Jun  9 17:30:07 2026
+ - Error 10: Неверный формат данных - 
+Tue Jun  9 17:30:14 2026
+ - Cipher selected: rabbit
+Tue Jun  9 17:31:28 2026
+ - Cipher selected: chacha20
+Tue Jun  9 17:35:39 2026
+ - Cipher selected: rabbit
+Tue Jun  9 17:41:02 2026
+ - Cipher selected: chacha20
+Tue Jun  9 17:41:14 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 17:56:01 2026
+ - Cipher selected: rabbit
+Tue Jun  9 17:56:08 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 17:57:02 2026
+ - File processed: input.txt -> input.enc (verified)
+Tue Jun  9 17:57:25 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 17:57:59 2026
+ - Error 4: Файл поврежден - 
+Tue Jun  9 18:48:31 2026
+ - Cipher selected: rabbit
+Tue Jun  9 18:48:37 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 18:48:46 2026
+ - Cipher selected: caesar
+Tue Jun  9 18:48:51 2026
+ - Test cipher: SUCCESS
+Tue Jun  9 18:52:40 2026
+ - Error 1: Шифр не выбран - 
+Tue Jun  9 18:53:20 2026
+ - Cipher selected: caesar
+Tue Jun  9 18:53:25 2026
+ - Test cipher: SUCCESS
