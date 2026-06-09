@@ -1,36 +1,48 @@
 #ifndef MGR_H
 #define MGR_H
 
-#include "../include/interface.h"
-#include "errors.h"
 #include <memory>
 #include <string>
 #include <vector>
 
-using namespace std;
+#include "../include/interface.h"
+#include "errors.h"
 
 class Mgr {
 private:
-    unique_ptr<Cipher> cur;
+    std::unique_ptr<Cipher> cur;
     
 public:
-    bool select(const string& name);
-    vector<string> list() const;
-    string info() const;
+    bool select(const std::string& name);
+    std::vector<std::string> list() const;
+    std::string info() const;
     
-    // Функции с возвратом кода ошибки
-    ErrorCode encText(const string& text, const string& key, string& output);
-    ErrorCode decText(const string& data, const string& key, string& output);
+    // Получить тип текущего шифра
+    Cipher::Type getCipherType() const;
     
-    ErrorCode encFile(const string& in, const string& out, const string& key);
-    ErrorCode decFile(const string& in, const string& out, const string& key);
+    // Для асимметричных шифров
+    std::pair<std::string, std::string> generateKeyPair();
+    std::string getPublicKey(const std::string& privateKey);
     
-    // Безопасные обёртки (не выбрасывают исключения)
-    bool encTextSafe(const string& text, const string& key, string& output);
-    bool decTextSafe(const string& data, const string& key, string& output);
+    // Для Diffie-Hellman
+    std::string generatePrivateKey();
+    std::string computePublicKey(const std::string& privateKey);
+    std::string computeSharedSecret(const std::string& privateKey, 
+                                    const std::string& otherPublic);
     
-    bool encFileSafe(const string& in, const string& out, const string& key);
-    bool decFileSafe(const string& in, const string& out, const string& key);
+    // Основные операции
+    ErrorCode encText(const std::string& text, const std::string& key, std::string& output);
+    ErrorCode decText(const std::string& data, const std::string& key, std::string& output);
+    
+    ErrorCode encFile(const std::string& in, const std::string& out, const std::string& key);
+    ErrorCode decFile(const std::string& in, const std::string& out, const std::string& key);
+    
+    // Безопасные обёртки
+    bool encTextSafe(const std::string& text, const std::string& key, std::string& output);
+    bool decTextSafe(const std::string& data, const std::string& key, std::string& output);
+    
+    bool encFileSafe(const std::string& in, const std::string& out, const std::string& key);
+    bool decFileSafe(const std::string& in, const std::string& out, const std::string& key);
 };
 
 #endif

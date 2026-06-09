@@ -16,11 +16,15 @@ enum class ErrorCode : int {
     ERR_PERMISSION_DENIED = 9,
     ERR_INVALID_FORMAT = 10,
     ERR_AUTH_FAILED = 11,
-    ERR_CONFIG_CORRUPTED = 12
+    ERR_CONFIG_CORRUPTED = 12,
+    ERR_USER_CANCEL = 13,
+    ERR_INVALID_CHOICE = 14,
+    ERR_INVALID_MENU_CHOICE = 15,
+    ERR_CORRUPTED_CIPHER = 16
 };
-
 
 std::string errorToString(ErrorCode code);
 void safeShowError(ErrorCode code, const std::string& details = "");
+bool isError(ErrorCode code);
 
-#endif
+#endif  

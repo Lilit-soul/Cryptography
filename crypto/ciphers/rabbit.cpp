@@ -163,6 +163,7 @@ public:
     string name() const override { return "rabbit"; }
     int keySize() const override { return 16; }
     int nonceSize() const override { return 8; }
+    Type getType() const override { return Type::SYMMETRIC; }
 };
 
 REG_CIPHER(Rabbit, "rabbit")

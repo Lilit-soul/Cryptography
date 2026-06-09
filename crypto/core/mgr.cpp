@@ -1,13 +1,17 @@
-#include "mgr.h"
-#include "../include/loader.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <cerrno>
+#include <exception>
+#include <stdexcept>
+
+#include "mgr.h"
+#include "../include/loader.h"
 
 using namespace std;
+
 
 string toLower(const string& s) {
     string result = s;
@@ -49,6 +53,57 @@ bool Mgr::select(const string& name) {
     return false;
 }
 
+Cipher::Type Mgr::getCipherType() const {
+    if (!cur) return Cipher::Type::SYMMETRIC;
+    return cur->getType();
+}
+
+pair<string, string> Mgr::generateKeyPair() {
+    if (!cur) return {"", ""};
+    return cur->generateKeyPair();
+}
+
+string Mgr::getPublicKey(const string& privateKey) {
+    if (!cur) return "";
+    return cur->getPublicKey(privateKey);
+}
+
+string Mgr::generatePrivateKey() {
+    if (!cur) return "";
+    return cur->generatePrivateKey();
+}
+
+string Mgr::computePublicKey(const string& privateKey) {
+    if (!cur) return "";
+    return cur->computePublicKey(privateKey);
+}
+
+string Mgr::computeSharedSecret(const string& privateKey, const string& otherPublic) {
+    if (!cur) return "";
+    return cur->computeSharedSecret(privateKey, otherPublic);
+}
+
+// Защищённый вызов методов шифра
+template<typename T>
+T safeCall(Cipher* cipher, const string& methodName, std::function<T()> func, T defaultValue = T{}) {
+    if (!cipher) {
+        safeShowError(ErrorCode::ERR_NO_CIPHER, "Шифр не выбран");
+        return defaultValue;
+    }
+    
+    try {
+        return func();
+    } catch (const std::exception& e) {
+        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
+                     "Ошибка при вызове " + methodName + ": " + e.what());
+        return defaultValue;
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
+                     "Неизвестная ошибка при вызове " + methodName);
+        return defaultValue;
+    }
+}
+
 vector<string> Mgr::list() const {
     try {
         return Loader::instance().list();
@@ -59,7 +114,21 @@ vector<string> Mgr::list() const {
 
 string Mgr::info() const {
     if (!cur) return "Шифр не выбран";
-    return cur->name() + " | ключ: " + to_string(cur->keySize()) + " байт | nonce: " + to_string(cur->nonceSize()) + " байт";
+    
+    try {
+        string name = cur->name();
+        int kSize = cur->keySize();
+        int nSize = cur->nonceSize();
+        return name + " | ключ: " + to_string(kSize) + 
+               " байт | nonce (IV): " + to_string(nSize) + " байт";
+    } catch (const std::exception& e) {
+        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, e.what());
+        return "Шифр повреждён";
+    } catch (...) {
+        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, "неизвестная ошибка");
+        return "Шифр повреждён";
+    }
+    return cur->name() + " | ключ: " + to_string(cur->keySize()) + " байт | nonce (IV): " + to_string(cur->nonceSize()) + " байт";
 }
 
 ErrorCode Mgr::encText(const string& text, const string& key, string& output) {
@@ -151,6 +220,7 @@ bool Mgr::decTextSafe(const string& data, const string& key, string& output) {
     }
 }
 
+// mgr.cpp
 ErrorCode Mgr::encFile(const string& in, const string& out, const string& key) {
     if (!cur) return ErrorCode::ERR_NO_CIPHER;
     
@@ -160,7 +230,6 @@ ErrorCode Mgr::encFile(const string& in, const string& out, const string& key) {
             return ErrorCode::ERR_FILE_NOT_FOUND;
         }
         
-        // Проверка на пустой файл
         f_in.seekg(0, ios::end);
         if (f_in.tellg() == 0) {
             f_in.close();
@@ -171,7 +240,19 @@ ErrorCode Mgr::encFile(const string& in, const string& out, const string& key) {
         vector<uint8_t> data((istreambuf_iterator<char>(f_in)), istreambuf_iterator<char>());
         f_in.close();
         
-        auto enc = cur->encrypt(data, key);
+        // Защищённый вызов encrypt
+        EncData enc;
+        try {
+            enc = cur->encrypt(data, key);
+        } catch (const std::exception& e) {
+            safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
+                         "Ошибка при шифровании: " + string(e.what()));
+            return ErrorCode::ERR_INVALID_KEY;
+        } catch (...) {
+            safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
+                         "Неизвестная ошибка при шифровании");
+            return ErrorCode::ERR_INVALID_KEY;
+        }
         
         ofstream f_out(out, ios::binary);
         if (!f_out) {
@@ -188,9 +269,11 @@ ErrorCode Mgr::encFile(const string& in, const string& out, const string& key) {
         
     } catch (const bad_alloc& e) {
         return ErrorCode::ERR_NO_MEMORY;
-    } catch (const exception& e) {
+    } catch (const std::exception& e) {
+        safeShowError(ErrorCode::ERR_INVALID_KEY, e.what());
         return ErrorCode::ERR_INVALID_KEY;
     } catch (...) {
+        safeShowError(ErrorCode::ERR_INVALID_KEY, "неизвестная ошибка");
         return ErrorCode::ERR_INVALID_KEY;
     }
 }

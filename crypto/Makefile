@@ -1,7 +1,15 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -O2 -Wall
-INCLUDES = -I. -Iincludes -Icore
-SRCS = main.cpp core/mgr.cpp core/ui.cpp core/errors.cpp ciphers/rabbit.cpp ciphers/chacha20.cpp
+INCLUDES = -I. -Icore -Iinclude -Iinclude/cipher
+
+SRCS = main.cpp \
+       core/mgr.cpp \
+       core/ui.cpp \
+       core/errors.cpp \
+       ciphers/chacha20.cpp \
+       ciphers/rabbit.cpp \
+       ciphers/caesar.cpp \
+
 OBJS = $(SRCS:.cpp=.o)
 TARGET = encrypt_fw
 
@@ -17,6 +25,6 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET) || true 
+	./$(TARGET)
 
 .PHONY: all clean run

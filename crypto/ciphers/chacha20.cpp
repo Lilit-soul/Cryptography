@@ -156,6 +156,7 @@ public:
     string name() const override { return "chacha20"; }
     int keySize() const override { return 32; }
     int nonceSize() const override { return 8; }
+    Type getType() const override { return Type::SYMMETRIC; } 
 };
 
 REG_CIPHER(ChaCha20, "chacha20")
