@@ -1,7 +1,11 @@
+#include <iostream>
+
 #include "core/mgr.h"
 #include "core/ui.h"
 #include "core/auth.h"
-#include <iostream>
+#include "core/errors.h"
+#include "core/menu_actions.h"
+
 
 using namespace std;
 
@@ -11,47 +15,95 @@ int main() {
     string key;
     
     clearScreen();
+    
     // Авторизация
     if (!runAuth(auth)) {
         return 1;
     }
+
+    getEncryptionKey(key);
     
-    clearScreen();
-    cout << "Добро пожаловать!\n";
+    MenuAction action = MenuAction::EXIT;
+    int choice;
+    ErrorCode result;
     
-    // Запрашиваем ключ шифрования
-    cout << "Введите ключ шифрования: ";
-    getline(cin, key);
-    
-    if (key.empty()) {
-        cout << "Предупреждение: ключ пуст. Шифрование будет небезопасным!\n";
-        waitForEnter();
-    }
-    
-    int ch;
     do {
         clearScreen();
+
         cout << "Ключ шифрования: " << (key.empty() ? "(пустой)" : key) << "\n";
         if (mgr.info() != "Шифр не выбран") {
             cout << "Шифр: " << mgr.info() << "\n";
         }
-        menu();
-        cin >> ch;
 
-        cin.ignore();
+        showMenu();
         
-        switch (ch) {
-            case 1: selectCipher(mgr); break;
-            case 2: testCipher(mgr, key); break;
-            case 3: encryptFile(mgr, key); break;
-            case 4: decryptFile(mgr, key); break;
-            case 5: listCiphers(mgr); break;
-            case 6: viewEncryptedFile(); break;
-            case 7: auth.changePassword(); waitForEnter(); break;
-            case 0: cout << "До свидания\n"; break;
-            default: cout << "Неверный выбор\n"; waitForEnter();
+        choice = getMenuChoice();
+        if (choice == -1) {
+            safeShowError(ErrorCode::ERR_INVALID_MENU_CHOICE);
+            waitForEnter();
+            continue;
         }
-    } while (ch != 0);
+
+        action = static_cast<MenuAction>(choice);
+        result = ErrorCode::SUCCESS;
+        
+        switch (action) {
+            case MenuAction::SELECT_CIPHER:
+                result = selectCipher(mgr);
+                // После выбора шифра покажем дополнительные опции
+                if (result == ErrorCode::SUCCESS) {
+                    if (mgr.getCipherType() == Cipher::Type::ASYMMETRIC) {
+                        handleAsymmetricCipher(mgr, key);
+                    } else if (mgr.getCipherType() == Cipher::Type::KEY_EXCHANGE) {
+                        handleKeyExchange(mgr, key);
+                    }
+                }
+                break;
+
+            case MenuAction::TEST_TEXT:
+                result = testCipher(mgr, key);
+                break;
+                
+            case MenuAction::PROCESS_FILE:
+                result = processFile(mgr, key);
+                break;
+                
+            case MenuAction::LIST_CIPHERS:
+                result = listCiphers(mgr);
+                break;
+                
+            case MenuAction::VIEW_ENCRYPTED:
+                result = viewEncryptedFile();
+                break;
+                
+            case MenuAction::CHANGE_PASSWORD:
+                auth.changePassword();
+                break;
+            
+            case MenuAction::CHANGE_KEY:
+                changeKey(key);
+                break;
+                
+            case MenuAction::EXIT:
+                cout << "Выход. До свидания!\n";
+                break;
+                
+            default:
+                result = ErrorCode::ERR_INVALID_CHOICE;
+                break;
+        }
+        
+        // Обработка ошибок
+        if (isError(result)) {
+            safeShowError(result);
+        }
+        
+        // ОДНО ожидание для всех действий (кроме выхода)
+        if (action != MenuAction::EXIT) {
+            waitForEnter();
+        }
+        
+    } while (action != MenuAction::EXIT);
     
     return 0;
 }

@@ -6,16 +6,14 @@
 #include <chrono>
 #include <ctime>
 
-using namespace std;
-
 class Logger {
 public:
-    static void log(const string& action) {
-        ofstream f("encrypt.log", ios::app);
+    static void log(const std::string& action) {
+        std::ofstream f("encrypt.log", std::ios::app);
         if (f) {
-            auto now = chrono::system_clock::now();
-            time_t time = chrono::system_clock::to_time_t(now);
-            f << ctime(&time) << " - " << action << "\n";
+            auto now = std::chrono::system_clock::now();
+            std::time_t time = std::chrono::system_clock::to_time_t(now);
+            f << std::ctime(&time) << " - " << action << "\n";
             f.close();
         }
     }
