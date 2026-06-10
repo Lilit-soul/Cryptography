@@ -32,18 +32,8 @@ public:
     };
     
     virtual Type getType() const { return Type::SYMMETRIC; }
-    
-    // Для асимметричных шифров
-    virtual std::pair<std::string, std::string> generateKeyPair() {
-        return {"", ""};
-    }
-    virtual std::string getPublicKey(const std::string& privateKey) { return ""; }
-    
-    // Для Diffie-Hellman
-    virtual std::string generatePrivateKey() { return ""; }
-    virtual std::string computePublicKey(const std::string& privateKey) { return ""; }
-    virtual std::string computeSharedSecret(const std::string& privateKey, 
-                                            const std::string& otherPublic) { return ""; }
+
+    virtual bool setup(std::string& key) { return true; }
     
     // Параметры
     virtual int keySize() const = 0;

@@ -8,7 +8,6 @@ SRCS = main.cpp \
        core/errors.cpp \
        ciphers/chacha20.cpp \
        ciphers/rabbit.cpp \
-       ciphers/caesar.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 TARGET = encrypt_fw
@@ -25,6 +24,6 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET)
+	./$(TARGET) || true
 
 .PHONY: all clean run

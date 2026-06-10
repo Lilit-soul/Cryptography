@@ -58,52 +58,6 @@ Cipher::Type Mgr::getCipherType() const {
     return cur->getType();
 }
 
-pair<string, string> Mgr::generateKeyPair() {
-    if (!cur) return {"", ""};
-    return cur->generateKeyPair();
-}
-
-string Mgr::getPublicKey(const string& privateKey) {
-    if (!cur) return "";
-    return cur->getPublicKey(privateKey);
-}
-
-string Mgr::generatePrivateKey() {
-    if (!cur) return "";
-    return cur->generatePrivateKey();
-}
-
-string Mgr::computePublicKey(const string& privateKey) {
-    if (!cur) return "";
-    return cur->computePublicKey(privateKey);
-}
-
-string Mgr::computeSharedSecret(const string& privateKey, const string& otherPublic) {
-    if (!cur) return "";
-    return cur->computeSharedSecret(privateKey, otherPublic);
-}
-
-// Защищённый вызов методов шифра
-template<typename T>
-T safeCall(Cipher* cipher, const string& methodName, std::function<T()> func, T defaultValue = T{}) {
-    if (!cipher) {
-        safeShowError(ErrorCode::ERR_NO_CIPHER, "Шифр не выбран");
-        return defaultValue;
-    }
-    
-    try {
-        return func();
-    } catch (const std::exception& e) {
-        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
-                     "Ошибка при вызове " + methodName + ": " + e.what());
-        return defaultValue;
-    } catch (...) {
-        safeShowError(ErrorCode::ERR_CORRUPTED_CIPHER, 
-                     "Неизвестная ошибка при вызове " + methodName);
-        return defaultValue;
-    }
-}
-
 vector<string> Mgr::list() const {
     try {
         return Loader::instance().list();
@@ -167,7 +121,7 @@ ErrorCode Mgr::decText(const string& data, const string& key, string& output) {
         uint32_t ivSize;
         memcpy(&ivSize, data.data(), sizeof(ivSize));
         
-        if (ivSize > 1024 || ivSize == 0) return ErrorCode::ERR_INVALID_FORMAT;
+        if (ivSize > 1024) return ErrorCode::ERR_INVALID_FORMAT;
         
         if (data.size() < sizeof(ivSize) + ivSize) return ErrorCode::ERR_INVALID_FORMAT;
         
@@ -301,10 +255,10 @@ ErrorCode Mgr::decFile(const string& in, const string& out, const string& key) {
             return ErrorCode::ERR_FILE_CORRUPTED;
         }
         
-        size_t msize;
+        uint32_t msize;
         f_in.read(reinterpret_cast<char*>(&msize), sizeof(msize));
         
-        if (msize > 1024 || msize == 0) {
+        if (msize > 1024) {
             f_in.close();
             return ErrorCode::ERR_FILE_CORRUPTED;
         }

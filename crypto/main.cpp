@@ -21,6 +21,8 @@ int main() {
         return 1;
     }
 
+    ensureDataDir();
+
     getEncryptionKey(key);
     
     MenuAction action = MenuAction::EXIT;
@@ -31,7 +33,7 @@ int main() {
         clearScreen();
 
         cout << "Ключ шифрования: " << (key.empty() ? "(пустой)" : key) << "\n";
-        if (mgr.info() != "Шифр не выбран") {
+        if (mgr.info() != "Шифр не выбран!") {
             cout << "Шифр: " << mgr.info() << "\n";
         }
 
@@ -50,13 +52,8 @@ int main() {
         switch (action) {
             case MenuAction::SELECT_CIPHER:
                 result = selectCipher(mgr);
-                // После выбора шифра покажем дополнительные опции
-                if (result == ErrorCode::SUCCESS) {
-                    if (mgr.getCipherType() == Cipher::Type::ASYMMETRIC) {
-                        handleAsymmetricCipher(mgr, key);
-                    } else if (mgr.getCipherType() == Cipher::Type::KEY_EXCHANGE) {
-                        handleKeyExchange(mgr, key);
-                    }
+                if (result == ErrorCode::SUCCESS && mgr.getCipher()) {
+                    mgr.getCipher()->setup(key);
                 }
                 break;
 

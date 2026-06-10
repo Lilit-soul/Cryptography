@@ -26,6 +26,10 @@ void clearScreen() {
     system("clear");
 }
 
+void ensureDataDir() {
+    mkdir("data", 0755);
+}
+
 void printHex(const string& s) {
     for (unsigned char c : s)
         cout << hex << setw(2) << setfill('0') << (int)c;
@@ -109,14 +113,6 @@ void getEncryptionKey(string& key) {
     }
 }
 
-bool isRegularFile(const string& path) {
-    struct stat path_stat;
-    if (stat(path.c_str(), &path_stat) != 0) {
-        return false;  // не существует или ошибка
-    }
-    return S_ISREG(path_stat.st_mode);  // true только для обычных файлов
-}
-
 ErrorCode selectCipher(Mgr& mgr) {
     auto list = mgr.list();
     if (list.empty()) {
@@ -141,9 +137,9 @@ ErrorCode selectCipher(Mgr& mgr) {
         try {
             string info = mgr.info();
             if (info.find("повреждён") != string::npos) {
-                cout << COLOR_YELLOW << "Шифр выбран, но может работать некорректно" << COLOR_RESET << "\n";
+                cout << COLOR_YELLOW << "Шифр выбран, но может работать некорректно!" << COLOR_RESET << "\n";
             } else {
-                cout << COLOR_GREEN << "Шифр выбран" << COLOR_RESET << "\n";
+                cout << COLOR_GREEN << "Шифр выбран!" << COLOR_RESET << "\n";
             }
         } catch (const std::exception& e) {
             cout << COLOR_RED << "Ошибка: выбранный шифр повреждён (" << e.what() << ")" << COLOR_RESET << "\n";
@@ -213,56 +209,78 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
         return ErrorCode::ERR_NO_CIPHER;
     }
     
-    // Показываем список файлов
-    cout << "\nФайлы в текущей директории:\n";
+    // Проверяем существование папки data
+    string dataDir = "data";
+    mkdir(dataDir.c_str(), 0755);
     
-    DIR* dir = opendir(".");
+    // Собираем список файлов из папки data (только файлы, не директории)
+    cout << "\n" << COLOR_CYAN << "Доступные файлы:" << COLOR_RESET << "\n";
+    
+    vector<string> files;
+    string dataPath = dataDir + "/";
+    
+    DIR* dir = opendir(dataPath.c_str());
     if (dir) {
         struct dirent* entry;
         while ((entry = readdir(dir)) != NULL) {
             string name = entry->d_name;
             if (name != "." && name != "..") {
-                cout << "   - " << name << "\n";
+                string fullEntryPath = dataPath + name;
+                struct stat st;
+                // Проверяем, что это не директория
+                if (stat(fullEntryPath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+                    continue;  // пропускаем директории
+                }
+                // Пропускаем уже зашифрованные файлы
+                if (name.length() > 4 && name.substr(name.length() - 4) == ".enc") {
+                    continue;
+                }
+                files.push_back(name);
             }
         }
         closedir(dir);
     }
     
-    cout << "\nВведите имя файла: ";
-    string filename;
-    getline(cin, filename);
-    
-    if (filename.empty()) {
-        return ErrorCode::ERR_INVALID_FORMAT;
-    }
-    
-    // Проверяем, что файл не является уже зашифрованным
-    if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".enc") {
-        cout << COLOR_RED << "Нельзя шифровать уже зашифрованный файл!" << COLOR_RESET << "\n";
-        cout << "Файлы с расширением .enc - это зашифрованные файлы.\n";
-        return ErrorCode::ERR_INVALID_FORMAT;
-    }
-    
-    // Проверяем, что это не директория
-    struct stat path_stat;
-    if (stat(filename.c_str(), &path_stat) != 0) {
+    if (files.empty()) {
+        cout << "   (нет файлов)\n";
+        cout << "Поместите файлы в папку 'data/'\n";
+        waitForEnter();
         return ErrorCode::ERR_FILE_NOT_FOUND;
     }
     
-    if (S_ISDIR(path_stat.st_mode)) {
-        cout << COLOR_RED << "Ошибка: \"" << filename << "\" является директорией, а не файлом!" << COLOR_RESET << "\n";
+    // Выводим файлы с номерами
+    for (size_t i = 0; i < files.size(); i++) {
+        cout << "   " << i + 1 << ". " << files[i] << "\n";
+    }
+    
+    cout << "\n" << COLOR_YELLOW << "Выберите номер: " << COLOR_RESET;
+    string choiceStr;
+    getline(cin, choiceStr);
+    
+    if (choiceStr.empty()) {
         return ErrorCode::ERR_INVALID_FORMAT;
     }
-
-    // Проверяем существование файла
-    ifstream test(filename);
-    if (!test) {
-        return ErrorCode::ERR_FILE_NOT_FOUND;
-    }
-    test.close();
     
-    // === 1. Читаем исходный файл ===
-    ifstream inFile(filename, ios::binary);
+    int choice;
+    try {
+        choice = stoi(choiceStr);
+    } catch (...) {
+        cout << COLOR_RED << "Ошибка: введите число!" << COLOR_RESET << "\n";
+        return ErrorCode::ERR_INVALID_FORMAT;
+    }
+    
+    if (choice < 1 || choice > (int)files.size()) {
+        cout << COLOR_RED << "Ошибка: номер от 1 до " << files.size() << COLOR_RESET << "\n";
+        return ErrorCode::ERR_INVALID_FORMAT;
+    }
+    
+    string filename = files[choice - 1];
+    string fullPath = dataPath + filename;
+    
+    cout << "\nВыбран: " << COLOR_CYAN << filename << COLOR_RESET << "\n";
+    
+    // === Читаем исходный файл ===
+    ifstream inFile(fullPath, ios::binary);
     vector<uint8_t> originalData((istreambuf_iterator<char>(inFile)), 
                                    istreambuf_iterator<char>());
     inFile.close();
@@ -274,9 +292,10 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
         originalExt = filename.substr(dotPos);
     }
     
-    cout << "\nИсходный файл: " << COLOR_CYAN << filename << COLOR_RESET << " (расширение: " << originalExt << ")\n";
+    cout << "\nИсходный файл: " << COLOR_CYAN << filename << COLOR_RESET 
+         << " (расширение: " << originalExt << ")\n";
     
-    // Шифруем данные
+    // Шифруем
     string encData;
     if (!mgr.encTextSafe(string(originalData.begin(), originalData.end()), key, encData)) {
         return ErrorCode::ERR_INVALID_KEY;
@@ -285,9 +304,9 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
     // Сохраняем зашифрованный файл
     string encFilename;
     if (dotPos != string::npos) {
-        encFilename = filename.substr(0, dotPos) + ".enc";
+        encFilename = dataPath + filename.substr(0, dotPos) + ".enc";
     } else {
-        encFilename = filename + ".enc";
+        encFilename = dataPath + filename + ".enc";
     }
 
     ofstream encFile(encFilename, ios::binary);
@@ -301,15 +320,15 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
     // Расшифровываем для проверки
     string decrypted;
     if (!mgr.decTextSafe(encData, key, decrypted)) {
-        cout << COLOR_RED << "Ошибка: не удалось расшифровать (возможно, неверный ключ)" << COLOR_RESET << "\n";
+        cout << COLOR_RED << "Ошибка: не удалось расшифровать" << COLOR_RESET << "\n";
         return ErrorCode::ERR_DECRYPT_FAIL;
     }
     
     // Проверяем, не существует ли уже файл decr_
-    string decFilename = "decr_" + filename;
+    string decFilename = dataPath + "decr_" + filename;
     ifstream existing(decFilename);
     if (existing) {
-        cout << COLOR_YELLOW << "Файл " << decFilename << " уже существует." << COLOR_RESET << "\n";
+        cout << COLOR_YELLOW << "Файл decr_" << filename << " уже существует." << COLOR_RESET << "\n";
         cout << "Перезаписать? (y/N): ";
         string answer;
         getline(cin, answer);
@@ -320,14 +339,14 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
     }
     existing.close();
     
-    // Сохраняем расшифрованный файл с префиксом decr_
+    // Сохраняем расшифрованный файл
     ofstream decFile(decFilename, ios::binary);
     if (!decFile) {
         return ErrorCode::ERR_CANNOT_CREATE;
     }
     decFile.write(decrypted.c_str(), decrypted.size());
     decFile.close();
-    cout << COLOR_GREEN << "Расшифровано (проверка): " << COLOR_RESET << decFilename << "\n";
+    cout << COLOR_GREEN << "Расшифровано (проверка): " << COLOR_RESET << "decr_" << filename << "\n";
     
     // Сравниваем с оригиналом
     if (originalData.size() != decrypted.size()) {
@@ -347,11 +366,10 @@ ErrorCode processFile(Mgr& mgr, const string& key) {
     
     if (match) {
         cout << "\n" << COLOR_GREEN << "УСПЕХ! Файл зашифрован и успешно расшифрован." << COLOR_RESET << "\n";
-        Logger::log("File processed: " + filename + " -> " + encFilename + " (verified)");
+        Logger::log("File processed: " + filename);
         return ErrorCode::SUCCESS;
     } else {
         cout << "\n" << COLOR_RED << "ОШИБКА: Расшифрованные данные не совпадают с оригиналом!" << COLOR_RESET << "\n";
-        cout << "   Возможно, проблема с шифром или ключом.\n";
         return ErrorCode::ERR_DECRYPT_FAIL;
     }
 }
@@ -371,76 +389,96 @@ ErrorCode listCiphers(Mgr& mgr) {
     }
 }
 
-void handleAsymmetricCipher(Mgr& mgr, string& key) {
-    cout << "\n" << COLOR_CYAN << "=== Асимметричный шифр ===" << COLOR_RESET << "\n";
-    
-    auto [privKey, pubKey] = mgr.generateKeyPair();
-    
-    cout << "Закрытый ключ (ваш): " << COLOR_YELLOW << privKey << COLOR_RESET << "\n";
-    cout << "Открытый ключ (для других): " << COLOR_GREEN << pubKey << COLOR_RESET << "\n";
-    
-    cout << "\nВведите открытый ключ собеседника: ";
-    string otherPub;
-    getline(cin, otherPub);
-    
-    if (!otherPub.empty()) {
-        key = otherPub;  // для шифрования используем открытый ключ
-        cout << COLOR_GREEN << "Открытый ключ установлен для шифрования" << COLOR_RESET << "\n";
-    }
-    
-    waitForEnter();
-}
-
-void handleKeyExchange(Mgr& mgr, string& key) {
-    cout << "\n" << COLOR_CYAN << "=== Diffie-Hellman обмен ключами ===" << COLOR_RESET << "\n";
-    
-    string myPrivate = mgr.generatePrivateKey();
-    string myPublic = mgr.computePublicKey(myPrivate);
-    
-    cout << "Ваш закрытый ключ: " << COLOR_YELLOW << myPrivate << COLOR_RESET << "\n";
-    cout << "Ваш открытый ключ: " << COLOR_GREEN << myPublic << COLOR_RESET << "\n";
-    
-    cout << "\nВведите открытый ключ собеседника: ";
-    string otherPublic;
-    getline(cin, otherPublic);
-    
-    if (!otherPublic.empty()) {
-        string sharedSecret = mgr.computeSharedSecret(myPrivate, otherPublic);
-        key = sharedSecret;
-        cout << COLOR_GREEN << "Общий секрет: " << sharedSecret << COLOR_RESET << "\n";
-        cout << "Теперь используйте этот ключ для шифрования" << COLOR_RESET << "\n";
-    }
-    
-    waitForEnter();
-}
 
 ErrorCode viewEncryptedFile() {
-    string filename;
-    cout << "Введите имя зашифрованного файла: ";
-    getline(cin, filename);
+    string dataDir = "data";
+    string dataPath = dataDir + "/";
     
-    if (filename.empty()) {
+    // Собираем список .enc файлов (только файлы, не директории)
+    cout << "\n" << COLOR_CYAN << "Зашифрованные файлы:" << COLOR_RESET << "\n";
+    
+    vector<pair<string, long long>> encFiles;
+    
+    DIR* dir = opendir(dataPath.c_str());
+    if (dir) {
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != NULL) {
+            string name = entry->d_name;
+            if (name != "." && name != "..") {
+                string fullEntryPath = dataPath + name;
+                struct stat st;
+                // Проверяем, что это не директория
+                if (stat(fullEntryPath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+                    continue;  // пропускаем директории
+                }
+                if (name.length() > 4 && name.substr(name.length() - 4) == ".enc") {
+                    long long size = st.st_size;
+                    encFiles.push_back({name, size});
+                }
+            }
+        }
+        closedir(dir);
+    }
+    
+    if (encFiles.empty()) {
+        cout << "   (нет зашифрованных файлов)\n";
+        waitForEnter();
+        return ErrorCode::ERR_FILE_NOT_FOUND;
+    }
+    
+    // Выводим файлы с номерами
+    for (size_t i = 0; i < encFiles.size(); i++) {
+        cout << "   " << i + 1 << ". " << encFiles[i].first 
+             << " (" << encFiles[i].second << " байт)\n";
+    }
+    
+    cout << "\n" << COLOR_YELLOW << "Выберите номер: " << COLOR_RESET;
+    string choiceStr;
+    getline(cin, choiceStr);
+    
+    if (choiceStr.empty()) {
         return ErrorCode::ERR_INVALID_FORMAT;
     }
     
-    ifstream file(filename, ios::binary);
+    int choice;
+    try {
+        choice = stoi(choiceStr);
+    } catch (...) {
+        cout << COLOR_RED << "Ошибка: введите число!" << COLOR_RESET << "\n";
+        return ErrorCode::ERR_INVALID_FORMAT;
+    }
+    
+    if (choice < 1 || choice > (int)encFiles.size()) {
+        cout << COLOR_RED << "Ошибка: номер от 1 до " << encFiles.size() << COLOR_RESET << "\n";
+        return ErrorCode::ERR_INVALID_FORMAT;
+    }
+    
+    string filename = encFiles[choice - 1].first;
+    string fullPath = dataPath + filename;
+    
+    cout << "\nПросмотр: " << COLOR_CYAN << filename << COLOR_RESET << "\n";
+    
+    ifstream file(fullPath, ios::binary);
     if (!file) {
         return ErrorCode::ERR_FILE_NOT_FOUND;
     }
     
+    // Проверяем минимальный размер файла
     file.seekg(0, ios::end);
-    if (file.tellg() == 0) {
-        file.close();
-        return ErrorCode::ERR_FILE_EMPTY;
-    }
+    streamoff fileSize = file.tellg();
     file.seekg(0, ios::beg);
     
-    size_t msize;
+    if (fileSize < 5) {
+        cout << COLOR_YELLOW << "Файл слишком мал для зашифрованного файла программы" << COLOR_RESET << "\n";
+        file.close();
+        return ErrorCode::ERR_FILE_CORRUPTED;
+    }
+    
+    uint32_t msize;
     file.read(reinterpret_cast<char*>(&msize), sizeof(msize));
     
-    if (!file || msize > 1024 || msize == 0) {
-        cout << COLOR_YELLOW << "Это не зашифрованный файл программы" << COLOR_RESET << "\n";
-        cout << "Файл не содержит корректных метаданных\n";
+    if (fileSize < (streamoff)(sizeof(msize) + msize)) {
+        cout << COLOR_YELLOW << "Файл повреждён: размер метаданных не соответствует файлу" << COLOR_RESET << "\n";
         file.close();
         return ErrorCode::ERR_FILE_CORRUPTED;
     }
@@ -476,9 +514,7 @@ ErrorCode viewEncryptedFile() {
         }
         cout << dec << "\n";
     }
-    
-    file.seekg(0, ios::end);
-    long long fileSize = static_cast<long long>(file.tellg());
+
     long long dataSize = fileSize - static_cast<long long>(sizeof(msize)) - static_cast<long long>(msize);
     
     cout << "\nРазмер данных: " << dataSize << " байт\n";

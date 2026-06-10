@@ -31,7 +31,7 @@ public:
         std::getline(std::cin, pwd1);
         
         if (pwd1.empty()) {
-            std::cout << "Ошибка: пароль не может быть пустым\n";
+            std::cout << "\033[31mОшибка: пароль не может быть пустым\033[0m\n";
             return false;
         }
         
@@ -39,7 +39,7 @@ public:
         std::getline(std::cin, pwd2);
         
         if (pwd1 != pwd2) {
-            std::cout << "Ошибка: пароли не совпадают\n";
+            std::cout << "\033[31mОшибка: пароли не совпадают\033[0m\n";
             return false;
         }
         
@@ -76,7 +76,7 @@ public:
         std::getline(std::cin, oldPwd);
         
         if (hashPassword(oldPwd) != passwordHash) {
-            std::cout << "Ошибка: неверный старый пароль\n";
+            std::cout << "\033[31mОшибка: неверный старый пароль\033[0m\n";
             return false;
         }
         
@@ -84,7 +84,7 @@ public:
         std::getline(std::cin, newPwd1);
         
         if (newPwd1.empty()) {
-            std::cout << "Ошибка: пароль не может быть пустым\n";
+            std::cout << "\033[31mОшибка: пароль не может быть пустым\033[0m\n";
             return false;
         }
         
@@ -92,7 +92,7 @@ public:
         std::getline(std::cin, newPwd2);
         
         if (newPwd1 != newPwd2) {
-            std::cout << "Ошибка: пароли не совпадают\n";
+            std::cout << "\033[31mОшибка: пароли не совпадают\033[0m\n";
             return false;
         }
         
@@ -104,7 +104,7 @@ public:
         f << passwordHash << "\n";
         f.close();
         
-        std::cout << "Пароль успешно изменён\n";
+        std::cout << "\033[32mПароль успешно изменён!\033[0m\n";
         return true;
     }
 };

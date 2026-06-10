@@ -19,16 +19,9 @@ public:
     
     // Получить тип текущего шифра
     Cipher::Type getCipherType() const;
+    Cipher* getCipher() { return cur.get(); }
     
-    // Для асимметричных шифров
-    std::pair<std::string, std::string> generateKeyPair();
-    std::string getPublicKey(const std::string& privateKey);
     
-    // Для Diffie-Hellman
-    std::string generatePrivateKey();
-    std::string computePublicKey(const std::string& privateKey);
-    std::string computeSharedSecret(const std::string& privateKey, 
-                                    const std::string& otherPublic);
     
     // Основные операции
     ErrorCode encText(const std::string& text, const std::string& key, std::string& output);
