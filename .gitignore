@@ -12,29 +12,3 @@ decr_*                   # расшифрованные проверочные �
 encrypt_fw               # готовый исполняемый файл
 *.o                      # объектные файлы
 *.d                      # файлы зависимостей
-*.exe                    # для Windows
-*.out                    # для Linux/macOS
-
-# === Временные файлы ===
-*.tmp
-*.swp
-*.swo
-*~
-*.bak
-
-# === Файлы IDE ===
-.vscode/                 # VS Code
-.idea/                   # CLion / IntelliJ
-*.code-workspace         # VS Code workspace
-*.suo                    # Visual Studio
-*.user                   # Visual Studio
-
-# === Файлы ОС ===
-.DS_Store                # macOS
-Thumbs.db                # Windows
-desktop.ini              # Windows
-
-# === Тестовые файлы (опционально) ===
-test_output/
-temp/
-*.test
