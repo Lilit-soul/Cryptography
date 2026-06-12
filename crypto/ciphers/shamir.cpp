@@ -153,7 +153,7 @@ public:
             cout << "1) простое число больше 255 и не больше 65535\n";
             cout << "2) секретный ключ Алисы, взаимно простой с первым числом минус 1\n";
             cout << "3) секретный ключ Боба, взаимно простой с первым числом минус 1\n";
-            cout << "Пример: 257,7,5\n";
+            cout << "Пример: 257,7,5\n\n";
             cout << "Введите параметры Шамира: ";
             string input;
             getline(cin, input);
@@ -200,7 +200,7 @@ public:
         result.meta = "";
         return result;
     }
-    
+   
     vector<uint8_t> decrypt(const EncData& data, const string& key) override {
         vector<uint8_t> result;
         if (data.data.empty()) {
@@ -229,7 +229,7 @@ public:
         }
         return result;
     }
-    
+   
     string name() const override { return "Shamir 3-pass"; }
     int keySize() const override { return 2; }
     int nonceSize() const override { return 0; }

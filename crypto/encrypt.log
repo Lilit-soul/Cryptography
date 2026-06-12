@@ -352,3 +352,101 @@ Wed Jun 10 13:03:11 2026
  - Cipher selected: rabbit
 Wed Jun 10 13:03:27 2026
  - Error 10: Неверный формат данных - 
+Fri Jun 12 17:32:44 2026
+ - Cipher selected: shamir
+Fri Jun 12 17:32:51 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:32:51 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:33:19 2026
+ - Encryption key changed
+Fri Jun 12 17:33:26 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:33:26 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:33:39 2026
+ - Cipher selected: caesar
+Fri Jun 12 17:33:45 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 17:34:34 2026
+ - File processed: input.txt
+Fri Jun 12 17:34:39 2026
+ - File processed: Michael Jackson - Billy Jean.mp3
+Fri Jun 12 17:34:48 2026
+ - Error 1: Шифр не выбран - 
+Fri Jun 12 17:34:55 2026
+ - Cipher selected: shamir
+Fri Jun 12 17:35:00 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:35:00 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:36:32 2026
+ - Encryption key changed
+Fri Jun 12 17:36:58 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 17:42:14 2026
+ - Encryption key changed
+Fri Jun 12 17:42:32 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:42:32 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:46:27 2026
+ - Encryption key changed
+Fri Jun 12 17:46:38 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:46:38 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:46:46 2026
+ - Encryption key changed
+Fri Jun 12 17:46:54 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 17:51:28 2026
+ - Cipher selected: shamir
+Fri Jun 12 17:51:47 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:51:47 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:52:19 2026
+ - Encryption key changed
+Fri Jun 12 17:52:26 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:52:26 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:53:23 2026
+ - Encryption key changed
+Fri Jun 12 17:53:28 2026
+ - Error 10: Неверный формат данных - 
+Fri Jun 12 17:53:34 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:53:34 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:55:02 2026
+ - Encryption key changed
+Fri Jun 12 17:55:06 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 17:55:11 2026
+ - Encryption key changed
+Fri Jun 12 17:55:14 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 17:55:33 2026
+ - Encryption key changed
+Fri Jun 12 17:55:37 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:55:37 2026
+ - Error 7: Неверный ключ - 
+Fri Jun 12 17:59:09 2026
+ - Cipher selected: shamir
+Fri Jun 12 18:00:30 2026
+ - Cipher selected: shamir
+Fri Jun 12 18:00:51 2026
+ - Cipher selected: shamir
+Fri Jun 12 18:01:11 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 18:01:19 2026
+ - File processed: Michael Jackson - Billy Jean.mp3
+Fri Jun 12 19:21:06 2026
+ - Cipher selected: shamir
+Fri Jun 12 19:25:09 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 19:25:31 2026
+ - File processed: Michael Jackson - Billy Jean.mp3
