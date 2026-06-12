@@ -10,6 +10,8 @@ SRCS = main.cpp \
        ciphers/rabbit.cpp \
        ciphers/diffi-helman.cpp \
        ciphers/elgamal.cpp \
+       ciphers/caesar.cpp \
+       ciphers/shamir.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 TARGET = encrypt_fw
