@@ -8,6 +8,8 @@ SRCS = main.cpp \
        core/errors.cpp \
        ciphers/chacha20.cpp \
        ciphers/rabbit.cpp \
+       ciphers/caesar.cpp \
+       ciphers/shamir.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 TARGET = encrypt_fw
