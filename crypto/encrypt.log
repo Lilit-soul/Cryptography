@@ -352,3 +352,233 @@ Wed Jun 10 13:03:11 2026
  - Cipher selected: rabbit
 Wed Jun 10 13:03:27 2026
  - Error 10: Неверный формат данных - 
+Thu Jun 11 23:14:05 2026
+ - Error 1: Шифр не выбран - 
+Thu Jun 11 23:14:16 2026
+ - Error 1: Шифр не выбран - 
+Thu Jun 11 23:14:34 2026
+ - Cipher selected: el_gamal
+Thu Jun 11 23:14:53 2026
+ - Error 6: Ошибка расшифровки - 
+Thu Jun 11 23:15:17 2026
+ - Error 6: Ошибка расшифровки - 
+Thu Jun 11 23:36:26 2026
+ - Cipher selected: el_gamal
+Thu Jun 11 23:36:51 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 00:37:05 2026
+ - Error 1: Шифр не выбран - 
+Fri Jun 12 00:37:20 2026
+ - Error 1: Шифр не выбран - 
+Fri Jun 12 00:39:02 2026
+ - Error 1: Шифр не выбран - 
+Fri Jun 12 00:40:14 2026
+ - Cipher selected: el_gamal
+Fri Jun 12 00:45:36 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 00:45:36 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:36 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:42 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 00:45:52 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:52 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:53 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:45:54 2026
+ - Error 15: Неверный ввод меню. Введите число от 0 до 7 - 
+Fri Jun 12 00:46:15 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 00:46:15 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 00:47:17 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 00:48:00 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 00:48:00 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 00:49:47 2026
+ - Cipher selected: el_gamal
+Fri Jun 12 00:50:02 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 00:51:55 2026
+ - Error 10: Неверный формат данных - 
+Fri Jun 12 00:52:11 2026
+ - File processed: input.txt
+Fri Jun 12 00:54:48 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 01:00:03 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 01:03:12 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 01:03:12 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 01:03:39 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 01:03:39 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 01:04:11 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 01:04:11 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 11:49:44 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 11:50:05 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 11:50:05 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 11:52:53 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 11:53:10 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 11:53:10 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 11:57:54 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 11:58:05 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 11:58:05 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 12:01:06 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 12:03:47 2026
+ - Error 1: Шифр не выбран - 
+Fri Jun 12 12:04:02 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 12:04:15 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 12:04:15 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 12:14:11 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 12:14:21 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 12:14:21 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 12:14:41 2026
+ - Cipher selected: el_gamal
+Fri Jun 12 12:14:51 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 12:26:26 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 12:26:34 2026
+ - Test cipher: FAILED - texts don't match
+Fri Jun 12 12:26:34 2026
+ - Error 6: Ошибка расшифровки - 
+Fri Jun 12 12:34:50 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 12:34:59 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 12:51:44 2026
+ - Cipher selected: diffie_hellman
+Fri Jun 12 12:51:54 2026
+ - Test cipher: SUCCESS
+Fri Jun 12 12:54:09 2026
+ - File processed: Michael Jackson - Billy Jean.mp3
+Fri Jun 12 12:56:35 2026
+ - Cipher selected: el_gamal
+Fri Jun 12 12:56:46 2026
+ - Error 6: Ошибка расшифровки - 
